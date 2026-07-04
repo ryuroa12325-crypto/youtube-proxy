@@ -1,21 +1,34 @@
 const express = require('express');
-const { ChatListener } = require('@letruxux/youtube-chat');
+const { LiveChat } = require('youtube-chat'); // 안정적인 라이브러리로 변경
 const app = express();
 
 let latestChat = { author: "", message: "", timestamp: 0 };
 let currentListener = null;
 
 function startYouTubeListener(videoId) {
-    if (currentListener) { currentListener.stop(); }
-    currentListener = new ChatListener(videoId);
-    currentListener.onMessage((message) => {
+    if (currentListener) {
+        currentListener.stop();
+    }
+    
+    // 원조 라이브러리 주입
+    currentListener = new LiveChat({ videoId: videoId });
+    
+    currentListener.on('chat', (chatItem) => {
+        // 메시지 텍스트 추출 추출
+        let messageText = "";
+        if (chatItem.message) {
+            messageText = chatItem.message.map(m => m.text || "").join("");
+        }
+        
         latestChat = {
-            author: message.author,
-            message: message.text, 
+            author: chatItem.author.name,
+            message: messageText, 
             timestamp: Date.now()
         };
     });
+    
     currentListener.start();
+    console.log(`유튜브 라이브 감시 시작: ${videoId}`);
 }
 
 app.get('/connect', (req, res) => {
@@ -25,7 +38,7 @@ app.get('/connect', (req, res) => {
         startYouTubeListener(videoId);
         res.json({ success: true });
     } catch (err) {
-      res.status(500).json({ success: false, error: err.message });
+        res.status(500).json({ success: false, error: err.message });
     }
 });
 
