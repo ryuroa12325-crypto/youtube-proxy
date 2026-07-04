@@ -1,0 +1,12 @@
+{
+  "name": "youtube-chat-proxy",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "@letruxux/youtube-chat": "^1.0.1",
+    "express": "^4.19.2"
+  }
+}
