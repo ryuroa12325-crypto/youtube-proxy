@@ -1,5 +1,6 @@
-const express = require('express');
-const { LiveChat } = require('youtube-chat'); // 안정적인 라이브러리로 변경
+import express from 'express';
+import { LiveChat } from 'youtube-chat';
+
 const app = express();
 
 let latestChat = { author: "", message: "", timestamp: 0 };
@@ -10,11 +11,9 @@ function startYouTubeListener(videoId) {
         currentListener.stop();
     }
     
-    // 원조 라이브러리 주입
     currentListener = new LiveChat({ videoId: videoId });
     
     currentListener.on('chat', (chatItem) => {
-        // 메시지 텍스트 추출 추출
         let messageText = "";
         if (chatItem.message) {
             messageText = chatItem.message.map(m => m.text || "").join("");
